@@ -1,0 +1,22 @@
+---
+tiers:
+    -
+        name: onap-k8s
+        order: 1
+        ci_loop: '(daily)|(weekly)'
+        description: >-
+            Set of basic k8s Functional tests to validate the ONAP installation.
+        testcases:
+            -
+                case_name: onap-k8s
+                project_name: functest
+                criteria: 100
+                blocking: false
+                description: >-
+                    This test case verifies that the ONAP pods are all Running
+                    and shows the pods, deployments, svc and events
+                run:
+                    name: 'Bashfeature'
+                    args:
+                        cmd:
+                            - check_onap_k8s.sh

@@ -35,7 +35,7 @@ nb_pods_not_running=$((`kubectl get pods -n onap | grep -v Running | grep -v fun
 if [ $nb_pods_not_running -ne 0 ]; then
 echo "$nb_pods_not_running pods (on $nb_pods) are not in Running state"
    echo "--------------------------------------------------------------------------------------"
-   kubectl get pods -n onap |grep -v Running
+   kubectl get pods -n onap |grep -v Running |grep -v functest
    exit 1
 else
 echo "all pods ($nb_pods) are running well"

@@ -20,3 +20,16 @@ tiers:
                     args:
                         cmd:
                             - /check_onap_k8s.sh
+            -
+                case_name: onap-helm
+                project_name: functest
+                criteria: 100
+                blocking: false
+                description: >-
+                    This test case verifies that the ONAP charts are in
+                    DEPLOYED status
+                run:
+                    name: 'bashfeature'
+                    args:
+                        cmd:
+                            - /check_onap_helm.sh

@@ -7,12 +7,13 @@ code=0
 
 # List Helm chart and get their status
 for i in $(helm ls |awk {'print $1'}|grep -v NAME);do
-   echo "Chart $i";
-   status=$(helm status $i |grep STATUS:);
-   echo ${status};
+   echo "Chart $i"
+   status=$(helm status $i |grep STATUS:)
+   echo ${status}
    if [ "${status}" != "STATUS: DEPLOYED" ]; then
-     echo "Chart problem";
-     code=1;
+     echo "Chart problem"
+     helm status $i -o yaml
+     code=1
    fi
    echo "--------------------------------------------------------------------------------------"
 done

@@ -26,4 +26,4 @@ tiers:
                     This test case verifies that the ONAP charts are in
                     DEPLOYED status
                 run:
-                    name: 'onap-helm'
+                    name: 'onap_helm'

@@ -6,6 +6,7 @@ echo "------------------------------------------------------------------------"
 code=0
 nb_charts=$(helm ls |awk {'print $1'}|grep -v NAME |wc -l)
 nb_failed_charts=0
+list_failed_charts="{"
 
 # List Helm chart and get their status
 for i in $(helm ls |awk {'print $1'}|grep -v NAME);do
@@ -17,15 +18,18 @@ for i in $(helm ls |awk {'print $1'}|grep -v NAME);do
         helm status $i -o yaml
         code=1
         let "nb_failed_charts++"
+        list_failed_charts="$list_failed_charts,"
     fi
     echo "--------------------------------------------------------------------"
 done
+list_failed_charts="$list_failed_charts}"
 
 echo "------------------------------------------------"
 echo "------- ONAP Helm tests ------------------------"
 echo "------------------------------------------------"
-echo ">>> Nb Helm charts: ${nb_charts}"
-echo ">>> Nb Failed Helm charts: ${nb_failed_charts}"
+echo ">>> Nb Helm Charts: ${nb_charts}"
+echo ">>> Nb Failed Helm Charts: ${nb_failed_charts}"
+echo ">>> List of Failed Helm Charts: ${list_failed_charts}"
 echo "------------------------------------------------"
 echo "------------------------------------------------"
 echo "------------------------------------------------"

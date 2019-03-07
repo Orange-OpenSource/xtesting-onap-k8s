@@ -15,8 +15,6 @@ Define the parent for Kubernetes testing.
 from __future__ import division
 
 import logging
-import os
-import re
 import subprocess
 import time
 
@@ -28,14 +26,14 @@ class K8sTesting(testcase.TestCase):
 
     __logger = logging.getLogger(__name__)
 
-    config = '/conf/.kube/config'
-
     def __init__(self, **kwargs):
         super(K8sTesting, self).__init__(**kwargs)
         self.cmd = []
         self.result = 0
+        self.details = {}
         self.start_time = 0
         self.stop_time = 0
+        self.criteria_string = ""
 
     def run_kubetest(self):  # pylint: disable=too-many-branches
         """Run the test suites"""
@@ -49,56 +47,38 @@ class K8sTesting(testcase.TestCase):
                 'Unexpected error' in output):
             raise Exception(output)
 
+        # create a log file
+        file_name = "/var/lib/xtesting/results/" + self.case_name + ".log"
+        log_file = open(file_name, "w")
+        log_file.write(output)
+        log_file.close()
+
         remarks = []
+        details = {}
         lines = output.split('\n')
         success = False
-        failure = False
-        i = 0
-        while i < len(lines):
-            if '[Fail]' in lines[i] or 'Failures:' in lines[i]:
-                self.__logger.error(lines[i])
-            if re.search(r'\[(.)*[0-9]+ seconds\]', lines[i]):
-                self.__logger.debug(lines[i])
-                i = i + 1
-                while i < len(lines) and lines[i] != '-' * len(lines[i]):
-                    if lines[i].startswith('STEP:') or ('INFO:' in lines[i]):
-                        break
-                    self.__logger.debug(lines[i])
-                    i = i + 1
-            if i >= len(lines):
-                break
-            success = 'SUCCESS!' in lines[i]
-            failure = 'FAIL!' in lines[i]
-            if success or failure:
-                if i != 0 and 'seconds' in lines[i - 1]:
-                    remarks.append(lines[i - 1])
-                remarks = remarks + lines[i].replace('--', '|').split('|')
-                break
-            i = i + 1
 
-        self.__logger.debug('-' * 10)
-        self.__logger.info("Remarks:")
+        for log in lines:
+            if log.startswith(">>>"):
+                remarks.append(log.replace('>', ''))
         for remark in remarks:
-            if 'seconds' in remark:
-                self.__logger.debug(remark)
-            elif 'Passed' in remark:
-                self.__logger.info("Passed: %s", remark.split()[0])
-            elif 'Skipped' in remark:
-                self.__logger.info("Skipped: %s", remark.split()[0])
-            elif 'Failed' in remark:
-                self.__logger.info("Failed: %s", remark.split()[0])
+            if ':' in remark:
+                details[remark.split(":", 1)[0].strip()] = (
+                    remark.split(":", 1)[1].strip())
+
+        # if 1 pod/helm chart if Failed, the testcase is failed
+        if int(details[self.criteria_string]) < 1:
+            success = True
+
+        self.details = details
+        self.__logger.info("details: %s", details)
 
         if success:
             self.result = 100
-        elif failure:
+        else:
             self.result = 0
 
     def run(self, **kwargs):
-
-        if not os.path.isfile(self.config):
-            self.__logger.error(
-                "Cannot run k8s testcases. Config file not found")
-            return self.EX_RUN_ERROR
 
         self.start_time = time.time()
         try:
@@ -112,19 +92,21 @@ class K8sTesting(testcase.TestCase):
         return res
 
 
-class K8sOnapTest(K8sTesting):
+class OnapK8sTest(K8sTesting):
     """Kubernetes smoke test suite"""
     def __init__(self, **kwargs):
         if "case_name" not in kwargs:
-            kwargs.get("case_name", 'k8s_smoke')
-        super(K8sOnapTest, self).__init__(**kwargs)
+            kwargs.get("case_name", 'onap-k8s')
+        super(OnapK8sTest, self).__init__(**kwargs)
         self.cmd = ['/check_onap_k8s.sh']
+        self.criteria_string = "Nb Failed Pods"
 
 
-class K8sHelmTest(K8sTesting):
+class OnapHelmTest(K8sTesting):
     """Kubernetes conformance test suite"""
     def __init__(self, **kwargs):
         if "case_name" not in kwargs:
-            kwargs.get("case_name", 'k8s_conformance')
-        super(K8sHelmTest, self).__init__(**kwargs)
+            kwargs.get("case_name", 'onap-helm')
+        super(OnapHelmTest, self).__init__(**kwargs)
         self.cmd = ['/check_onap_helm.sh']
+        self.criteria_string = "Nb Failed Helm Charts"

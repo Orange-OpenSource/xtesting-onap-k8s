@@ -26,5 +26,5 @@ RUN set -x && \
     pip install --no-cache-dir \
         git+https://github.com/Orange-OpenSource/xtesting-onap-k8s.git@$ONAP_TESTS_TAG#egg=onap_k8s
 
-COPY testcases.yaml /usr/lib/python2.7/site-packages/xtesting/ci/testcases.yaml
+COPY docker/testcases.yaml /usr/lib/python2.7/site-packages/xtesting/ci/testcases.yaml
 CMD ["run_tests", "-t", "all"]

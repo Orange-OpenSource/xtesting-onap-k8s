@@ -12,8 +12,8 @@ ARG ONAP_TESTS_TAG=master
 
 ADD https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_VERSION}/bin/linux/amd64/kubectl /usr/local/bin/kubectl
 
-COPY check_onap_k8s.sh /check_onap_k8s.sh
-COPY check_onap_helm.sh /check_onap_helm.sh
+COPY scripts/check_onap_k8s.sh /check_onap_k8s.sh
+COPY scripts/check_onap_helm.sh /check_onap_helm.sh
 
 RUN set -x && \
     apk add --no-cache curl ca-certificates && \

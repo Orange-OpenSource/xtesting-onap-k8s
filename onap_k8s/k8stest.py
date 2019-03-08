@@ -63,8 +63,18 @@ class K8sTesting(testcase.TestCase):
                 remarks.append(log.replace('>', ''))
         for remark in remarks:
             if ':' in remark:
-                details[remark.split(":", 1)[0].strip()] = (
-                    remark.split(":", 1)[1].strip())
+                # 2 possible Results
+                # * numeric nb pods, failed, duration
+                # * list of pods, charts,...
+                if '[]' in remark:
+                    # it is a list
+                    str1 = remark.split(":", 1)[1].strip().replace(
+                        ']', '').replace('[', '')
+                    str2array = str1.replace('"', '').split(", ")
+                    details[remark.split(":", 1)[0].strip()] = str2array
+                else:
+                    details[remark.split(":", 1)[0].strip()] = int(
+                        remark.split(":", 1)[1].strip())
 
         # if 1 pod/helm chart if Failed, the testcase is failed
         if int(details[self.criteria_string]) < 1:

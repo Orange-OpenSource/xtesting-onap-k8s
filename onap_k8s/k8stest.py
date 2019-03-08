@@ -66,12 +66,11 @@ class K8sTesting(testcase.TestCase):
                 # 2 possible Results
                 # * numeric nb pods, failed, duration
                 # * list of pods, charts,...
-                if '[]' in remark:
+                if '[' in remark:
                     # it is a list
                     str1 = remark.split(":", 1)[1].strip().replace(
                         ']', '').replace('[', '')
-                    str2array = str1.replace('"', '').split(", ")
-                    details[remark.split(":", 1)[0].strip()] = str2array
+                    details[remark.split(":", 1)[0].strip()] = str1.split(",")
                 else:
                     details[remark.split(":", 1)[0].strip()] = int(
                         remark.split(":", 1)[1].strip())

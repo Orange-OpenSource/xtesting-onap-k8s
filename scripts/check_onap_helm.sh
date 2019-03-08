@@ -6,7 +6,7 @@ echo "------------------------------------------------------------------------"
 code=0
 nb_charts=$(helm ls |awk {'print $1'}|grep -v NAME |wc -l)
 nb_failed_charts=0
-list_failed_charts="[$(helm ls |grep -v DEPLOYED |grep -v NAME |awk '{print $1 $5}')]"
+list_failed_charts="[$(helm ls |grep -v DEPLOYED |grep -v NAME |awk '{print $1}')]"
 
 # List Helm chart and get their status
 for i in $(helm ls |awk {'print $1'}|grep -v NAME);do

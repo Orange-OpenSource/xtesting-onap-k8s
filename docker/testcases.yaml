@@ -1,7 +1,7 @@
 ---
 tiers:
     -
-        name: onap-k8s
+        name: onap-infra
         order: 1
         ci_loop: '(daily)|(weekly)'
         description: >-
@@ -16,10 +16,7 @@ tiers:
                     This test case verifies that the ONAP pods are all Running
                     and shows the pods, deployments, svc and events
                 run:
-                    name: 'bashfeature'
-                    args:
-                        cmd:
-                            - /check_onap_k8s.sh
+                    name: 'onap_k8s'
             -
                 case_name: onap-helm
                 project_name: functest
@@ -29,7 +26,4 @@ tiers:
                     This test case verifies that the ONAP charts are in
                     DEPLOYED status
                 run:
-                    name: 'bashfeature'
-                    args:
-                        cmd:
-                            - /check_onap_helm.sh
+                    name: 'onap_helm'

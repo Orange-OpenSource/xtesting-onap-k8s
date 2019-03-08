@@ -2,8 +2,9 @@ FROM opnfv/xtesting
 
 ENV HOME=/config
 
-ENV KUBERNETES_VERSION="v1.6.4"
-ENV HELM_VERSION="v2.9.1"
+ARG KUBERNETES_VERSION="v1.6.4"
+ARG HELM_VERSION="v2.9.1"
+ARG ONAP_TESTS_TAG=master
 
 # Install kubectl
 # Note: Latest version may be found on:
@@ -20,7 +21,10 @@ RUN set -x && \
     adduser kubectl -Du 2342 -h /config && \
     wget -q https://storage.googleapis.com/kubernetes-helm/helm-${HELM_VERSION}-linux-amd64.tar.gz -O - | tar -xzO linux-amd64/helm > /usr/local/bin/helm && \
     chmod +x /usr/local/bin/helm && \
-    chmod +x /check_onap_*.sh
+    chmod +x /check_onap_*.sh && \
+    pip install --upgrade pip && \
+    pip install --no-cache-dir \
+        git+https://github.com/Orange-OpenSource/xtesting-onap-k8s.git@$ONAP_TESTS_TAG#egg=onap_k8s
 
 COPY testcases.yaml /usr/lib/python2.7/site-packages/xtesting/ci/testcases.yaml
 CMD ["run_tests", "-t", "all"]

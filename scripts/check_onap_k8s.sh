@@ -48,7 +48,7 @@ for duration in $(kubectl get pods -n onap |grep Running | awk {'print $5}');do
     elif [ "$duration_unit" = "m" ]; then
         time_coeff=60
     fi
-    if [[ $duration_time*$time_coeff > $duration_max ]]; then
+    if [[ $(($duration_time * $time_coeff)) > $duration_max ]]; then
         duration_max=$(($duration_time * $time_coeff))
     fi
 done

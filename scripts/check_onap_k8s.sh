@@ -63,6 +63,7 @@ echo "---------------------------------------------------------------------"
     for i in $(kubectl get pods -n onap |grep -v Running |grep onap |awk '{print $1}');do
         echo "****************************************************************"
         kubectl describe pod $i -n onap
+        kubectl logs --all-containers=true -n onap $i
     done
     code=1
 else

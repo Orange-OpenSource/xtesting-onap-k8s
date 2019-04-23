@@ -29,6 +29,24 @@ echo "***************************"
 kubectl get events -n onap
 echo "------------------------------------------------------------------------"
 
+# show ONAP config maps
+echo "Show ONAP kubernetes config maps"
+echo "***************************"
+kubectl get cm -n onap
+echo "------------------------------------------------------------------------"
+
+# show ONAP jobs
+echo "Show ONAP kubernetes jobs"
+echo "***************************"
+kubectl get jobs -n onap
+echo "------------------------------------------------------------------------"
+
+# show ONAP statefulsets
+echo "Show ONAP kubernetes statefulset"
+echo "***************************"
+kubectl get sts -n onap
+echo "------------------------------------------------------------------------"
+
 # if all pods in RUNNING state exit 0, else exit 1
 nb_pods=$((`kubectl get pods -n onap | grep -v functest | wc -l` -1))
 nb_pods_not_running=$((`kubectl get pods -n onap | grep -v Running | grep -v functest | wc -l`-1))
@@ -63,6 +81,7 @@ echo "---------------------------------------------------------------------"
     for i in $(kubectl get pods -n onap |grep -v Running |grep onap |awk '{print $1}');do
         echo "****************************************************************"
         kubectl describe pod $i -n onap
+        kubectl logs --all-containers=true -n onap $i
     done
     code=1
 else

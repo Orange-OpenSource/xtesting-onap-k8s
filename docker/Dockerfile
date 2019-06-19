@@ -22,8 +22,8 @@ RUN set -x && \
     wget -q https://storage.googleapis.com/kubernetes-helm/helm-${HELM_VERSION}-linux-amd64.tar.gz -O - | tar -xzO linux-amd64/helm > /usr/local/bin/helm && \
     chmod +x /usr/local/bin/helm && \
     chmod +x /check_onap_*.sh && \
-    pip install --upgrade pip && \
-    pip install --no-cache-dir \
+    pip3 install --upgrade pip && \
+    pip3 install --no-cache-dir \
         git+https://github.com/Orange-OpenSource/xtesting-onap-k8s.git@$ONAP_TESTS_TAG#egg=onap_k8s
 
 COPY docker/testcases.yaml /usr/lib/python2.7/site-packages/xtesting/ci/testcases.yaml

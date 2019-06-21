@@ -49,9 +49,31 @@ echo "------------------------------------------------------------------------"
 
 # if all pods in RUNNING state exit 0, else exit 1
 nb_pods=$((`kubectl get pods -n onap | grep -v functest | wc -l` -1))
-nb_pods_not_running=$((`kubectl get pods -n onap | grep -v Running | grep -v functest | grep -v Completed | wc -l`-1))
 list_failed_pods=$(kubectl get pods -n onap |grep -v Running |grep -v functest |grep -v NAME | grep -v Completed | awk '{print $1}')
-nice_list=$(echo $list_failed_pods |sed  -e "s/ /,/g")
+list_filtered_failed_pods=()
+
+for i in $list_failed_pods;do
+	status=$(kubectl get pods -n onap $i | grep -v NAME | awk '{print $3'})
+	# in case of Error or Init:Error
+  # we check that another instance is not already Completed or Running
+	if [ $status = "Error" ]  || [ $status = "Init:Error" ];then
+      echo "$i in Status Error or Init Error found for the pods, is is really true...."
+      # By default pod naming is similar, keep only the root to check
+	    root_name=${i::-6}
+	    kubectl get pods -n onap |grep $root_name | grep Completed
+	    if [ $? ];then
+		    echo "Instance Completed found."
+      else
+		    echo "No Completed instance found."
+	      list_filtered_failed_pods+=$i,
+      fi
+  else
+      # Other status are not running/not completed pods
+	    list_filtered_failed_pods+=$i,
+	fi
+done
+
+nice_list=${list_filtered_failed_pods::-1}
 
 # calculate estiamtion of the deployment duration (max age of Running pod)
 duration_max=0
@@ -70,6 +92,8 @@ for duration in $(kubectl get pods -n onap |grep Running | awk {'print $5}');do
         duration_max=$(($duration_time * $time_coeff))
     fi
 done
+IFS=,
+nb_pods_not_running=$(echo "$nice_list" | tr -cd , | wc -c)
 
 if [ $nb_pods_not_running -ne 0 ]; then
 echo "$nb_pods_not_running pods (on $nb_pods) are not in Running state"
@@ -78,7 +102,7 @@ echo "---------------------------------------------------------------------"
     echo "--------------------------------------------------------------------"
     echo "Describe non running pods"
     echo "*************************"
-    for i in $(kubectl get pods -n onap |grep -v Running |grep onap |awk '{print $1}');do
+    for i in $nice_list;do
         echo "****************************************************************"
         kubectl describe pod $i -n onap
         kubectl logs --all-containers=true -n onap $i

@@ -49,8 +49,8 @@ echo "------------------------------------------------------------------------"
 
 # if all pods in RUNNING state exit 0, else exit 1
 nb_pods=$((`kubectl get pods -n onap | grep -v functest | wc -l` -1))
-nb_pods_not_running=$((`kubectl get pods -n onap | grep -v Running | grep -v functest | wc -l`-1))
-list_failed_pods=$(kubectl get pods -n onap |grep -v Running |grep -v functest |grep -v NAME |awk '{print $1}')
+nb_pods_not_running=$((`kubectl get pods -n onap | grep -v Running | grep -v functest | grep -v Completed | wc -l`-1))
+list_failed_pods=$(kubectl get pods -n onap |grep -v Running |grep -v functest |grep -v NAME | grep -v Completed | awk '{print $1}')
 nice_list=$(echo $list_failed_pods |sed  -e "s/ /,/g")
 
 # calculate estiamtion of the deployment duration (max age of Running pod)

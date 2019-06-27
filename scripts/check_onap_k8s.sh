@@ -98,7 +98,7 @@ nb_pods_not_running=$(echo "$nice_list" | tr -cd , | wc -c)
 if [ $nb_pods_not_running -ne 0 ]; then
 echo "$nb_pods_not_running pods (on $nb_pods) are not in Running state"
 echo "---------------------------------------------------------------------"
-    kubectl get pods -n onap |grep -v Running |grep -v functest
+    kubectl get pods -n onap | grep -v Running | grep -v functest | grep -v Completed
     echo "--------------------------------------------------------------------"
     echo "Describe non running pods"
     echo "*************************"

@@ -48,7 +48,7 @@ kubectl get sts -n onap
 echo "------------------------------------------------------------------------"
 
 # if all pods in RUNNING state exit 0, else exit 1
-nb_pods=$((`kubectl get pods -n onap | grep -v functest | wc -l` -1))
+nb_pods=$((`kubectl get pods -n onap | grep Running | grep -v functest | wc -l` -1))
 list_failed_pods=$(kubectl get pods -n onap |grep -v Running |grep -v functest |grep -v NAME | grep -v Completed | awk '{print $1}')
 list_filtered_failed_pods=()
 
@@ -60,7 +60,7 @@ for i in $list_failed_pods;do
       echo "$i in Status Error or Init Error found for the pods, is is really true...."
       # By default pod naming is similar, keep only the root to check
 	    root_name=${i::-6}
-	    kubectl get pods -n onap |grep $root_name | grep Completed
+	    kubectl get pods -n onap | grep $root_name | grep Completed
 	    if [ $? ];then
 		    echo "Instance Completed found."
       else
@@ -78,7 +78,7 @@ nice_list=${list_filtered_failed_pods::-1}
 # calculate estiamtion of the deployment duration (max age of Running pod)
 duration_max=0
 time_coeff=1
-for duration in $(kubectl get pods -n onap |grep Running | awk {'print $5}');do
+for duration in $(kubectl get pods -n onap | grep Running | awk {'print $5}');do
     duration_unit=$(echo "${duration: -1}")
     duration_time=$(echo "${duration::-1}")
     if [ "$duration_unit" = "d" ]; then

@@ -75,23 +75,6 @@ done
 
 nice_list=${list_filtered_failed_pods::-1}
 
-# calculate estiamtion of the deployment duration (max age of Running pod)
-duration_max=0
-time_coeff=1
-for duration in $(kubectl get pods -n onap | grep Running | awk {'print $5}');do
-    duration_unit=$(echo "${duration: -1}")
-    duration_time=$(echo "${duration::-1}")
-    if [ "$duration_unit" = "d" ]; then
-        time_coeff=86400
-    elif [ "$duration_unit" = "h" ]; then
-        time_coeff=3600
-    elif [ "$duration_unit" = "m" ]; then
-        time_coeff=60
-    fi
-    if [[ $(($duration_time * $time_coeff)) > $duration_max ]]; then
-        duration_max=$(($duration_time * $time_coeff))
-    fi
-done
 IFS=,
 nb_pods_not_running=$(echo "$nice_list" | tr -cd , | wc -c)
 
@@ -118,7 +101,6 @@ echo "------------------------------------------------"
 echo ">>> Nb Pods: $nb_pods"
 echo ">>> Nb Failed Pods: $nb_pods_not_running"
 echo ">>> List of Failed Pods: [$nice_list]"
-echo ">>> Deployment Duration Estimation (s): $duration_max"
 echo "------------------------------------------------"
 echo "------------------------------------------------"
 echo "------------------------------------------------"

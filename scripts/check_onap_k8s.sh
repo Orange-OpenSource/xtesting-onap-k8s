@@ -76,7 +76,7 @@ done
 nice_list=${list_filtered_failed_pods::-1}
 
 IFS=,
-nb_pods_not_running=$(echo "$nice_list" | tr -cd , | wc -c)
+nb_pods_not_running=$(echo "$list_filtered_failed_pods" | tr -cd , | wc -c)
 
 if [ $nb_pods_not_running -ne 0 ]; then
 echo "$nb_pods_not_running pods (on $nb_pods) are not in Running state"
